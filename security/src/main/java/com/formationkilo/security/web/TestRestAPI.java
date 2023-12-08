@@ -9,6 +9,6 @@ import java.util.Map;
 public class TestRestAPI {
     @GetMapping("/dataTest")
     public Map<String, Object>dataTest(){
-        return Map.of("message","Data test");
+        return Map.of("message","Data Test");
     }
 }
