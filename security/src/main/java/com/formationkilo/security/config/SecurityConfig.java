@@ -68,7 +68,7 @@ public class SecurityConfig {
           http
                 .csrf(csrf->csrf.disable())
                 .authorizeHttpRequests((authorizeRequests) -> authorizeRequests
-                         .requestMatchers(AntPathRequestMatcher.antMatcher("/dataTest")).permitAll()
+                //         .requestMatchers(AntPathRequestMatcher.antMatcher("/dataTest")).permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
