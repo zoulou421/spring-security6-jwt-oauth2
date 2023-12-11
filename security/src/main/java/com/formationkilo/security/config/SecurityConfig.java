@@ -10,13 +10,18 @@ import com.nimbusds.jwt.JWT;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -39,8 +44,23 @@ import java.security.interfaces.RSAPublicKey;
 public class SecurityConfig {
     private final RsaKeysConfig rsaKeysConfig;
     private final PasswordEncoder passwordEncoder;
+    //@Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
     @Bean
-    public InMemoryUserDetailsManager inMemoryUserDetailsManager(){
+    public AuthenticationManager authenticationManagerBean(UserDetailsService userDetailsService) {
+        //DaoAuthenticationProvider daoAuthenticationProvider=new DaoAuthenticationProvider();
+        //or else
+        var authProvider=new DaoAuthenticationProvider();
+        authProvider.setPasswordEncoder(passwordEncoder);
+        authProvider.setUserDetailsService(userDetailsService);
+        return new ProviderManager(authProvider);
+    }
+
+    @Bean
+   //public InMemoryUserDetailsManager inMemoryUserDetailsManager(){
+    public UserDetailsService inMemoryUserDetailsManager(){
         return
                 new InMemoryUserDetailsManager(
                     /*
@@ -74,6 +94,7 @@ public class SecurityConfig {
                 .csrf(csrf->csrf.disable())
                 .authorizeHttpRequests((authorizeRequests) -> authorizeRequests
                        // .requestMatchers(AntPathRequestMatcher.antMatcher("/dataTest2")).permitAll()
+                         .requestMatchers(AntPathRequestMatcher.antMatcher("/token/**")).permitAll()
                         .anyRequest().authenticated()
                 )
                   .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -94,7 +115,6 @@ public class SecurityConfig {
          return new NimbusJwtEncoder(jwkSource);
 
     }
-
 
 
 }
