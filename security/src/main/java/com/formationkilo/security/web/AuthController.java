@@ -37,7 +37,6 @@ public class AuthController {
               .expiresAt(instant.plus(5, ChronoUnit.MINUTES))
               .issuer("security")// security represent the app name that generated the token
               .claim("scope",scope)
-
               .build();
       String jwtAcessToken=jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
       idToken.put("accessToken",jwtAcessToken);

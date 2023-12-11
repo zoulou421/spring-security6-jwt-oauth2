@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -31,6 +33,9 @@ import java.security.interfaces.RSAPublicKey;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+// @EnableMethodSecurity(prePostEnabled = true) //@EnableGlobalMethodSecurity(prePostEnabled = true)
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 public class SecurityConfig {
     private final RsaKeysConfig rsaKeysConfig;
     private final PasswordEncoder passwordEncoder;
@@ -68,12 +73,12 @@ public class SecurityConfig {
           http
                 .csrf(csrf->csrf.disable())
                 .authorizeHttpRequests((authorizeRequests) -> authorizeRequests
-                //         .requestMatchers(AntPathRequestMatcher.antMatcher("/dataTest")).permitAll()
+                       // .requestMatchers(AntPathRequestMatcher.antMatcher("/dataTest2")).permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults())
-                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                  .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                   .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))
+                  .httpBasic(Customizer.withDefaults())
           ;
         return http.build();
     }
