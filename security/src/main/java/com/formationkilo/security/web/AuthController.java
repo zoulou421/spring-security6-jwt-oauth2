@@ -46,8 +46,8 @@ public class AuthController {
       idToken.put("accessToken",jwtAcessToken);
       return idToken;
    }
-   @PostMapping("/token")
-   public Map<String,String>jwtToken(String username, String password){
+   @PostMapping("/token3")
+   public Map<String,String>jwtToken3(String username, String password){
       Authentication authentication=authenticationManagerBean.authenticate(
               new UsernamePasswordAuthenticationToken(username,password)
       );
@@ -65,6 +65,40 @@ public class AuthController {
               .build();
       String jwtAcessToken=jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
       idToken.put("accessToken",jwtAcessToken);
+      return idToken;
+   }
+   @PostMapping("/token")
+   public Map<String,String>jwtToken(String username, String password, boolean withRefreshToken){
+      Authentication authentication=authenticationManagerBean.authenticate(
+              new UsernamePasswordAuthenticationToken(username,password)
+      );
+      Map<String,String>idToken=new HashMap<>();
+      Instant instant=Instant.now();
+      //Collection<? extends GrantedAuthority>authorities=authentication.getAuthorities()
+      String scope=authentication.getAuthorities().stream().map(aut->aut.getAuthority())
+              .collect(Collectors.joining(" "));
+      JwtClaimsSet jwtClaimsSet=JwtClaimsSet.builder()
+              .subject(authentication.getName())
+              .issuedAt(instant)//actuel date or system date
+              .expiresAt(instant.plus(withRefreshToken?1:5, ChronoUnit.MINUTES))
+              .issuer("security")// security represent the app name that generated the token
+              .claim("scope",scope)
+              .build();
+      String jwtAcessToken=jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
+      idToken.put("accessToken",jwtAcessToken);
+      if(withRefreshToken){
+         JwtClaimsSet jwtClaimsSetRefresh=JwtClaimsSet.builder()
+                 .subject(authentication.getName())
+                 .issuedAt(instant)//actuel date or system date
+                 .expiresAt(instant.plus(5, ChronoUnit.MINUTES))
+                 .issuer("security")// security represent the app name that generated the token
+                 //.claim("scope",scope) you don't need to send roles.
+                 .build();
+         String jwtRefreshToken=jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSetRefresh)).getTokenValue();
+         //add this:
+         idToken.put("RefreshToken",jwtRefreshToken);
+
+      }
       return idToken;
    }
 }
