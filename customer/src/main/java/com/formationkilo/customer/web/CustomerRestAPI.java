@@ -10,8 +10,8 @@ import java.util.Map;
 @RestController
 public class CustomerRestAPI {
     @GetMapping("/customer")
-    //@PreAuthorize("hasAuthority('SCOPE_ROLE_ADMIN')")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('SCOPE_ROLE_ADMIN')")
+    //@PreAuthorize("hasAuthority('ADMIN')")
     public Map<String,Object>customer(Authentication authentication){
         return Map.of("name","Bonevy",
                 "email","bonevybeby@formationkilo.com",
